@@ -198,7 +198,7 @@ Now, let's figure out how we will prove this property:
    More formally, this property can be expressed as:
 
 
-     sites(p,q) := calls(p,f) /\ calls(q,g) /\ reaches(p,q)
+        sites(p,q) := calls(p,f) /\ calls(q,g) /\ reaches(p,q)
 
    where `reaches(x,y)` is true if there exists a control flow graph with
    a path between `x` and `y.
