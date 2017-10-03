@@ -220,7 +220,7 @@ We will start with several `open` and `include` statements that will
 prepare our development context. Add the following to the top of the
 `check_path.ml` file.
 
-```
+```ocaml
 open Core_kernel.Std
 open Bap.Std
 open Graphlib.Std
@@ -241,7 +241,7 @@ module, but it looks cleaner and makes it easier for a reader to
 identify that this particular section of code deals with the command
 line interface
 
-```
+```ocaml
 let main src dst proj = ()
 
 module Cmdline = struct
