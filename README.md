@@ -187,7 +187,7 @@ Now, let's figure out how we will prove this property:
    so the property `must` hold for all paths.
 
 2. If `f` calls `g`, either directly or by calling a function that
-   calls `g`, them `f` occurs before `g`. The call to `g` still may not occur,
+   calls `g`, then `f` occurs before `g`. The call to `g` still may not occur,
    as we ignore path constraints, so this gives us the may modality.
    We will express this as `calls(f,g)`.
 
