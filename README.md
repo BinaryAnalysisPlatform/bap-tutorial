@@ -201,7 +201,7 @@ Now, let's figure out how we will prove this property:
         sites(p,q) := calls(p,f) /\ calls(q,g) /\ reaches(p,q)
 
    where `reaches(x,y)` is true if there exists a control flow graph with
-   a path between `x` and `y.
+   a path between `x` and `y`.
 
 To summarize, in order to prove that `f -> G not(g)` holds for the static model of our program,
 we need to prove that the following doesn't hold
