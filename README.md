@@ -192,7 +192,7 @@ Now, let's figure out how we will prove this property:
    We will express this as `calls(f,g)`.
 
 3. If there is a subroutine that has two calls that lead to `f` and `g`
-   correspondingly, and this calls are reachable in the control flow graph
+   correspondingly, and these calls are reachable in the control flow graph
    of the subroutine, then `g` may be called after `f` with the may modality.
    (Again, we do not consider the feasibility of the path constraint).
    More formally, this property can be expressed as:
