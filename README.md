@@ -187,12 +187,12 @@ Now, let's figure out how we will prove this property:
    so the property `must` hold for all paths.
 
 2. If `f` calls `g`, either directly or by calling a function that
-   calls `g`, them `f` occurs before `g`. The call to `g` still may not occur,
+   calls `g`, then `f` occurs before `g`. The call to `g` still may not occur,
    as we ignore path constraints, so this gives us the may modality.
    We will express this as `calls(f,g)`.
 
 3. If there is a subroutine that has two calls that lead to `f` and `g`
-   correspondingly, and this calls are reachable in the control flow graph
+   correspondingly, and these calls are reachable in the control flow graph
    of the subroutine, then `g` may be called after `f` with the may modality.
    (Again, we do not consider the feasibility of the path constraint).
    More formally, this property can be expressed as:
@@ -201,7 +201,7 @@ Now, let's figure out how we will prove this property:
         sites(p,q) := calls(p,f) /\ calls(q,g) /\ reaches(p,q)
 
    where `reaches(x,y)` is true if there exists a control flow graph with
-   a path between `x` and `y.
+   a path between `x` and `y`.
 
 To summarize, in order to prove that `f -> G not(g)` holds for the static model of our program,
 we need to prove that the following doesn't hold
