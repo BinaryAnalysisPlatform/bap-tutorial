@@ -118,11 +118,13 @@ also echo all passed arguments.
 You can also run the binary using `bap`. The binary will not be
 run on an actual CPU, but emulated using the Primus Framework.
 
-To get the disassembly of the executable use `-dasm` option, e.g.,
+To output the executable in the default assembler use `-dasm` option, e.g.,
 
 ```
 bap ./exe -dasm
 ```
+
+ProTip: if you prefer the intel syntax use `--llvm-x86-syntax=intel`. 
 
 To get the IR just use the `-d` option, e.g.,
 
@@ -132,33 +134,39 @@ bap ./exe -d
 
 You can also use `-dcfg` to get the control-flow graphs, and
 `-dcallgraph` to dump the program call graph. To get the full list of
-supported formats use the `--list-formats` option, e.g.,
+supported formats for the `project` data structure use the 
+`bap list formats -f project` command, e.g.,
 
 ```
-bap --list-formats
-adt          (1.0.0)          print program IR in ADT format
-asm          (1.0.0)          print assembly instructions
-asm.adt      (1.0.0)          print assembly instruction endcoded in ADT format
-asm.decoded  (1.0.0)          print assembly instructions as it was decoded
-asm.sexp     (1.0.0)          print assembly instructions as it was decoded
-bil          (1.0.0)          print BIL instructions
-bil.adt      (1.0.0)          print BIL instructions in ADT format
-bil.sexp     (1.0.0)          print BIL instructions in Sexp format
-bir          (1.0.0)          print program in IR
-callgraph    (1.0.0)          print program callgraph in DOT format
-cfg          (1.0.0)          print rich CFG for each procedure
-marshal      (1.0.0)          OCaml standard marshaling format
-symbols      (1.0.0)          print symbol table
+$ bap list formats -f project
+  Bap.Std.Project:
+    symbols (1.0.0)        print symbol table
+    ogre (1.0.0)           print the file specification in the OGRE format
+    marshal (2.0.0)        OCaml standard marshaling format
+    knowledge (1.0.0)      dumps the knowledge base
+    graph (1.0.0)          print unlabeled CFG for each procedure
+    cfg (1.0.0)            print rich CFG for each procedure
+    callgraph (1.0.0)      print program callgraph in DOT format
+    bir (1.0.0)            print program in IR
+    bil.sexp (1.0.0)       print BIL instructions in Sexp format
+    bil.adt (1.0.0)        print BIL instructions in ADT format
+    bil (1.0.0)            print BIL instructions
+    asm.sexp (1.0.0)       print assembly instructions as it was decoded
+    asm.decoded (1.0.0)    print assembly instructions as it was decoded
+    asm.adt (1.0.0)        print assembly instruction endcoded in ADT format
+    asm (1.0.0)            print assembly instructions
+    adt (1.0.0)            print program IR in ADT format
+
 ```
 
-For more options see `bap --help`. For options specific to a plugin
-`<PLUGIN>` use `bap --<PLUGIN>-help`, for example, the `run` plugin
-help page is available via `bap --run-help`.
+For more options see `bap --help` or `man bap`. To get information about a plugin
+named `<PLUGIN` use the `bap --<PLUGIN>-help>` option. e.g., for the `optimization`
+plugin, `bap --optimization-help`.
 
 ProTip: if you have a GUI setup, then you can use `xdot` for interactive
 visualization of control flow graphs:
 ```sh
-bap exe -dcfg --print-symbol=main | xdot
+bap exe -dcfg --print-symbol=main | xdot -
 ```
 
 ## Theoretical Background
@@ -221,7 +229,7 @@ prepare our development context. Add the following to the top of the
 `check_path.ml` file.
 
 ```ocaml
-open Core_kernel.Std
+open Core_kernel
 open Bap.Std
 open Graphlib.Std
 open Format
