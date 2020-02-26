@@ -53,8 +53,8 @@ binary distribution. If you're using some Debian derivative, then the
 following will install BAP on your system.
 
 ```
-wget https://github.com/BinaryAnalysisPlatform/bap/releases/download/v1.3.0/{bap,libbap,libbap-dev}_1.3.0.deb
-sudo dpkg -i {bap,libbap,libbap-dev}_1.3.0.deb
+wget https://github.com/BinaryAnalysisPlatform/bap/releases/download/v2.0.0/{bap,libbap,libbap-dev}_2.0.0.deb
+sudo dpkg -i {bap,libbap,libbap-dev}_2.0.0.deb
 sudo install pip
 sudo pip install bap networkx
 ```
