@@ -299,7 +299,7 @@ parser. The interface is described thoroughly in the reference
 [documentation][3].
 
 
-[3]: http://binaryanalysisplatform.github.io/bap/api/master/Bap.Std.Self.Config.html
+[3]: https://binaryanalysisplatform.github.io/bap/api/master/bap/Bap/Std/Self/Config/index.html
 
 ### Building, Installing, and Running
 
