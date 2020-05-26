@@ -299,7 +299,7 @@ parser. The interface is described thoroughly in the reference
 [documentation][3].
 
 
-[3]: http://binaryanalysisplatform.github.io/bap/api/master/Bap.Std.Self.Config.html
+[3]: https://binaryanalysisplatform.github.io/bap/api/master/bap/Bap/Std/Self/Config/index.html
 
 ### Building, Installing, and Running
 
@@ -482,11 +482,11 @@ let verify src dst prog : proof option =
   | None -> None
 ```
 
-Proving that for all control flow graphs there is no such callsite to
-the destination function that is reachable from a callsite to the source,
+Proving that for all control flow graphs there is no callsite to the
+destination function that is reachable from a callsite to the source,
 would be a little bit harder. We need to enumerate all subroutines,
 obtain their control flow graphs, and then check the connectivity of each pair of
-calls, that lead to the destination and source function respectively.
+calls of the form: call to destination, call to source function.
 
 We will address this problems using the bottom-up approach. We will
 start with the supporting code, that will enumerate all interesting
