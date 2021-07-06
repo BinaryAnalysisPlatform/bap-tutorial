@@ -3,14 +3,14 @@ BAP Tutorial
 
 ## Introduction
 
-In this tutorial we will develop a non-trivial plugin that will verify
+In this tutorial, we will develop a non-trivial plugin that will verify
 that in a program a certain sequence of calls doesn't happen. We will
 develop the analysis in both OCaml and Python. You can choose either
-path, or even both paths.
+path or even both paths.
 
 ## Takeaways
 
-By passing this tutorial you will learn how to use BAP basic
+After finishing this tutorial you will learn how to use BAP basic
 capabilities and how to extend BAP using our plugin system. You will
 learn how to examine programs, by looking into their intermediate
 representations (IR) or disassembly. You will also learn how to run
@@ -19,7 +19,7 @@ binaries in the emulated environment.
 ### OCaml Path Takeaways
 
 1. how to build and install plugins
-2. how to use command line arguments in a plugin
+2. how to use command-line arguments in a plugin
 3. how to work with IR and different graph representations.
 
 ### Python Path Takeaways
@@ -32,12 +32,12 @@ binaries in the emulated environment.
 ## Preparation
 
 To complete the OCaml path of the tutorial you will need an OCaml
-development environment, bap, and all the necessary libraries. We have
-prepared a Vagrantfile, that will setup your virtual machine using
-Vagrant. If you have `vagrant` installed on your machine the following
-will setup and prepare the necessary development environment.
+development environment, bap, and all the necessary libraries. The easiest option is to [install BAP from opam][3]. But if you don't want to spend time on that, don't worry. We have prepared a Vagrantfile, that will set up your virtual machine using Vagrant. If you have `vagrant` installed on your machine the following will set up and prepare the necessary development environment.
+
+
 
 ```
+# if you don't want to install bap from opam yourself
 wget http://tiny.cc/Vagrantfile
 vagrant up
 vagrant ssh
@@ -45,7 +45,7 @@ vagrant ssh
 
 The last command will ssh you into the installed virtual machine, that
 has BAP and all the necessary libraries readily available. It also
-have Emacs preinstalled and configured to work with OCaml.
+has Emacs preinstalled and configured to work with OCaml.
 
 If you're going to take only the Python part of the tutorial and do
 not want to install any virtual machines, then you can use BAP's
@@ -53,8 +53,8 @@ binary distribution. If you're using some Debian derivative, then the
 following will install BAP on your system.
 
 ```
-wget https://github.com/BinaryAnalysisPlatform/bap/releases/download/v2.0.0/{bap,libbap,libbap-dev}_2.0.0.deb
-sudo dpkg -i {bap,libbap,libbap-dev}_2.0.0.deb
+wget https://github.com/BinaryAnalysisPlatform/bap/releases/download/v2.3.0/{bap,libbap,libbap-dev}_2.3.0.deb
+sudo dpkg -i {bap,libbap,libbap-dev}_2.3.0.deb
 sudo install pip
 sudo pip install bap networkx
 ```
@@ -93,13 +93,12 @@ emacs check_path.py
 
 [1]: https://github.com/ocaml/merlin
 [2]: https://github.com/BinaryAnalysisPlatform/bap/wiki/Emacs#configuring-merlin
-
+[3]: https://github.com/BinaryAnalysisPlatform/bap#from-sources
 
 ## First steps with bap
 
-We will need some binary to play with. For the purpose of this
-tutorial, we created a special binary that is small, but still
-non-trivial. You can get it using `wget`
+We will need some binary to play with. Especially for this
+tutorial, we created a binary that is small, but still non-trivial. You can get it using `wget`
 
 ```
 wget tiny.cc/bap-echo -O exe
@@ -113,7 +112,7 @@ chmod a+x exe
 ```
 
 The binary will parse and print some verses from Shakespeare. It will
-also echo all passed arguments.
+also echo all its arguments.
 
 You can also run the binary using `bap`. The binary will not be
 run on an actual CPU, but emulated using the Primus Framework.
@@ -172,7 +171,7 @@ bap exe -dcfg --print-symbol=main | xdot -
 ## Theoretical Background
 
 The purpose of our analysis is to verify that for all execution paths
-in a program a call to the function `f` is not followed by a call to
+in a program, a call to the function `f` is not followed by a call to
 the function `g`, where `f` and `g` are specified by a user. We can
 express this property concisely using Linear Temporal Logic:
 
@@ -194,8 +193,7 @@ Now, let's figure out how we will prove this property:
    This property has a strong "must" modality. Since the call indeed can't happen,
    so the property `must` hold for all paths.
 
-2. If `f` calls `g`, either directly or by calling a function that
-   calls `g`, then `f` occurs before `g`. The call to `g` still may not occur,
+2. If `f` calls `g`, either directly or by calling a function that calls `g`, then `f` occurs before `g`. The call to `g` still may not occur,
    as we ignore path constraints, so this gives us the may modality.
    We will express this as `calls(f,g)`.
 
@@ -211,8 +209,7 @@ Now, let's figure out how we will prove this property:
    where `reaches(x,y)` is true if there exists a control flow graph with
    a path between `x` and `y`.
 
-To summarize, in order to prove that `f -> G not(g)` holds for the static model of our program,
-we need to prove that the following doesn't hold
+To summarize, to prove that `f -> G not(g)` holds for the static model of our program, we need to prove that the following doesn't hold
 
     f /\ g \/ calls(f,g) \/ ∃p∃q, sites(p,q)
 
@@ -230,6 +227,7 @@ prepare our development context. Add the following to the top of the
 
 ```ocaml
 open Core_kernel
+open Poly
 open Bap.Std
 open Graphlib.Std
 open Format
@@ -243,8 +241,7 @@ that you have set up Merlin and didn't make any errors in your code.
 
 ### Defining the Command Line Interface
 
-We will create a `Cmdline` module with the defintion of our command line
-interface. It is not required to put the code in a separate
+We will create a `Cmdline` module with the definition of our command line interface. It is not required to put the code in a separate
 module, but it looks cleaner and makes it easier for a reader to
 identify that this particular section of code deals with the command
 line interface
@@ -284,22 +281,22 @@ explanations:
 
 The `when_ready` function takes one argument, that is a function that
 will be called as soon as system configuration is processed and
-command line arguments are parsed. The function will take a record,
+command-line arguments are parsed. The function will take a record,
 that has only one field `get`, that is a function on itself, that will
 take a value of type `'a param` and will extract a value of type '`a`
 from it. The `{get=(!!)}` syntax, binds the `get` function to the
 `(!!)` unary operator that can be used nicely to extract values from
 parameters.
 
-To summarize, a user specifies the command line interface, but using
+To summarize, a user specifies the command-line interface using
 the `param` function. Then the `Config.when_ready` function is used to
-get the `get` function, that is a key that will unlock the parameters,
-and extract the values, that are written there by the command-line
+bind the `get` function, which is a key that will unlock the parameters,
+and extract the values that are written there by the command-line
 parser. The interface is described thoroughly in the reference
-[documentation][3].
+[documentation][4].
 
 
-[3]: https://binaryanalysisplatform.github.io/bap/api/master/bap/Bap/Std/Self/Config/index.html
+[4]: https://binaryanalysisplatform.github.io/bap/api/master/bap/Bap/Std/Self/Config/index.html
 
 ### Building, Installing, and Running
 
@@ -323,7 +320,7 @@ the same name as the plugin name, except that all underscores are
 substituted with dashes.
 
 The `--check-path-src=malloc` will pass `malloc` as an argument to the
-`src` parameter. Note, that in order to pass an argument to a plugin
+`src` parameter. Note, that to pass an argument to a plugin
 parameter you need to prefix the parameter with the plugin name.
 
 When developing, it is convenient to run all three commands at once,
@@ -340,16 +337,16 @@ store this command in some build script.
 Whenever you need to recompile, just hit `C-c C-c` and Emacs will
 recompile using the last compilation command.
 
-See the [Emacs manual][4] for more information about compilation.
+See the [Emacs manual][5] for more information about compilation.
 
 
-[4]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation.html#Compilation
+[5]: https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation.html#Compilation
 
 
 ### Trivial Proof
 
-We will first check the trivial proof, i.e., when one of the functions
-or both are not present. For that we will write a function, that will
+We will first check the trivial proof, i.e., when one of the functions,
+or both, are not present. For that we will write a function, that will
 translate a name of a function, as specified by a user, to the term
 identifier of this function.
 
@@ -379,10 +376,7 @@ Intermediate Representation (IR) and two term identifiers, one for the source fu
 and another for the destination function.
 
 The function will try to find a path in the program call graph, that leads from
-the source function to the destination function. If there is no such
-path then for each control flow graph we will try to find a path
-between a callsite that reaches the source function and a
-callsite that reaches the destination function.
+the source function to the destination function. If there is no such path then for each control flow graph we will try to find a path between a callsite that reaches the source function and a callsite that reaches the destination function.
 
 We will work with two different graph representations, one for the
 call graph, and another for the control flow graph, let's introduce
@@ -395,7 +389,7 @@ module CFG = Graphs.Tid
 
 Our `verify` function return type will be `proof option`, i.e., it
 will return `Some proof` if the proof was found, otherwise an absence of
-a proof is the proof that the relation will hold, unless there is a not yet
+a proof is the proof that the relation will hold unless there is a not yet
 discovered indirect call.
 
 Let's define the `proof` type as a variant type with two branches that
@@ -430,7 +424,7 @@ let pp_sites = pp_path CFG.Edge.src CFG.Edge.dst
 The `pp_path` function is parametrized with the `get_src` and
 `get_dst` functions that will extract, correspondingly, the source node and
 the destination node of an edge. Then it will print the source of the first
-edge, and iterate over all all edges and print their
+edge, and iterate over all edges and print their
 destinations. Recall, that an edge consists of two endpoints and a
 label (we will ignore the label for now). Thus a path is a
 sequence of `m` edges, connecting `m+1` nodes, e.g.,
@@ -440,7 +434,7 @@ sequence of `m` edges, connecting `m+1` nodes, e.g.,
       ||       ||              ||
       e0       e1              em
 
-Since, we want our output to be concise, we will print only `m+1`
+Since we want our output to be concise, we will print only `m+1`
 nodes, i.e., in our case `s,n0,n1,...,d`.
 
 
@@ -472,7 +466,7 @@ let verify src dst prog : proof option = None
 
 First of all, let's try to prove, that there is a path in the program
 call graph from the source function to the destination function. It
-would be even easier then the trivial proof:
+would be even easier than the trivial proof:
 
 ```ocaml
 let verify src dst prog : proof option =
@@ -485,12 +479,11 @@ let verify src dst prog : proof option =
 Proving that for all control flow graphs there is no callsite to the
 destination function that is reachable from a callsite to the source,
 would be a little bit harder. We need to enumerate all subroutines,
-obtain their control flow graphs, and then check the connectivity of each pair of
-calls of the form: call to destination, call to source function.
+obtain their control flow graphs, and then check the connectivity of each pair of calls of the form: call to the destination, call to the source function.
 
-We will address this problems using the bottom-up approach. We will
+We will address these problems using the bottom-up approach. We will
 start with the supporting code, that will enumerate all interesting
-callsites from a subroutine term. For that we need to identify whether
+callsites from a subroutine term. For that, we need to identify whether
 a callsite, that is a call term, may lead to an invocation of a target
 function. That would be the `reaches` predicate:
 
@@ -499,7 +492,7 @@ let reaches cg callee target =
   Graphlib.is_reachable (module CG) cg callee target
 ```
 
-Now we are ready to write the `callsites` function, that will take the
+Now we are ready to write the `callsites` function, which will take the
 call graph `cg`, the `target` function, and the subroutine term `sub`,
 and return a sequence of calls that has a destination function, that
 reaches `target` in the call graph.
@@ -519,7 +512,7 @@ let callsites cg target sub =
 
 In our implementation, we are ignoring local jumps, as well as return
 statements and CPU interrupts. We also ignore indirect jumps and
-calls, expecting that it is the task for another analysis to make all
+calls, expecting that it is the task of another analysis to make all
 possible control flow explicit in the graph.
 
 Now we have all the necessary tools to finish our analysis, we will
@@ -551,7 +544,7 @@ call) reaches both the destination and the source, then it means that
 we have two distinct calls in the basic block that are mutually
 exclusive by the invariant of a control flow graph, or that we have
 one call where the destination function is invoked strictly before the
-source function. The only other case, is ruled out by the first phase
+source function. The only other case is ruled out by the first phase
 of our analysis, that proved that there is no path between the source
 function and the destination function in the call graph.
 
@@ -569,9 +562,9 @@ structures. But we will start from the easy stuff first.
 
 ### Running bap from Python
 
-Unfortunately, currently we do not provide an interface for writing
+Unfortunately, currently, we do not provide an interface for writing
 real plugins in Python and so far, the only way to use BAP from Python
-is to run the `bap` executable, and to parse its output. Fortunately,
+is to run the `bap` executable and to parse its output. Fortunately,
 we provide some supporting code for this, so running `bap` is as easy
 as:
 
@@ -579,7 +572,7 @@ as:
     proj = bap.run('./echo')
 
 
-We recommend to run bap in some interactive REPL, such as IPython,
+We recommend running bap in some interactive REPL, such as IPython,
 that makes it easy to explore the data structures that are returned
 from the bap module functions.
 
@@ -622,16 +615,16 @@ if __name__ == '__main__':
 
 We specify one positional argument for the target binary, as well as
 two mandatory arguments, the names of the source and destination
-functions. Our verification function, is expected to return `None`, if
+functions. Our verification function is expected to return `None`, if
 no counter-example was found, or a tuple if we found a proof. The
 first element of the tuple represents the kind of the proof, i.e.,
-whether we found a relation in a call graph or in a control flow
+whether we found a relation in a call graph or a control flow
 graph, and the second element is the path itself.
 
 
 ### Building Graphs
 
-BAP represents graphs using [Algebraic Data Types][5]. It is easier
+BAP represents graphs using [Algebraic Data Types][6]. It is easier
 to work with ADT using the Visitor pattern. The idea is simple. A
 complex ADT, like the IR in our case, is a tree with many different
 kinds of branches and leaves. The base visitor class will traverse the
@@ -640,10 +633,10 @@ named `enter_Xxx` will be called (if it exists). For example, when a
 basic block is entered, the `enter_Blk` method will be invoked with
 the particular instance of the block.
 
-We will implent `GraphsBuilder` that will descent
+We will implement `GraphsBuilder` that will descent
 through the program IR and build two kinds of graphs simultaneously -
 the program callgraph, and a list of control flow graphs (for each
-subroutine). Our builder state (other than graphs itself) will include
+subroutine). Our builder state (other than graphs themselves) will include
 the current subroutine and the current basic block:
 
 ```python
@@ -704,8 +697,8 @@ def direct(jmp):
     return jmp.arg if jmp is not None and jmp.constr == 'Direct' else None
 ```
 
-Whenever we enter the `Goto` statement, that represent a transfer of
-the control flow between two basic block in a function, we just add a
+Whenever we enter the `Goto` statement, that represents a transfer of
+the control flow between two basic blocks in a function, we just add a
 new edge, if this transfer is explicit (i.e., direct)
 
 ```python
@@ -771,14 +764,14 @@ planning to reuse the same collector for all subroutines.
 
 Now we have a full arsenal of tools to implement the verification
 procedure. It is rather straightforward, we will start by finding
-target functions, using the [find][6] method that is provided by all
+target functions, using the [find][8] method that is provided by all
 instances of the `Seq` class. If one of the targets is not present,
 then the verification condition is satisfied trivially and we bail out
 of the function. Otherwise, we instantiate `GraphsBuilder` and run it
 to build the graphs. We then look at the call graph to see if there
 is a path between the source and destination functions. If there is no
 such path, then we are looking at each CFG for a pair of
-callsites to the target functions that has a path. And if there is one,
+callsites to the target functions that have a path. And if there is one,
 then it is returned.
 
 ```python
@@ -809,4 +802,4 @@ def verify(prog, src_name, dst_name):
     return None
 ```
 
-[6]: http://pythonhosted.org/bap/bap.adt.Seq-class.html#find
+[8]: http://pythonhosted.org/bap/bap.adt.Seq-class.html#find
