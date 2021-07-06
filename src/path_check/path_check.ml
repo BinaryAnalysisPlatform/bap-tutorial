@@ -1,4 +1,5 @@
-open Core_kernel.Std
+open Core_kernel
+open Poly
 open Bap.Std
 open Graphlib.Std
 open Format
