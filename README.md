@@ -211,9 +211,7 @@ Now, let's figure out how we will prove this property:
 
 To summarize, to prove that `f -> G not(g)` holds for the static model of our program, we need to prove that the following doesn't hold
 
-    f /\ g \/ calls(f,g) \/ ∃p∃q, sites(p,q)
-
-
+    f /\ g /\ (calls(f,g) \/ ∃p∃q, sites(p,q))
 
 
 
